@@ -2,8 +2,8 @@ name: Film Listesini Guncelle
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Her gece 00:00'da otomatik çalışır
-  workflow_dispatch: # Manuel çalıştırma butonu ekler
+    - cron: '0 0 * * *' # Her gece 00:00'da
+  workflow_dispatch: # Manuel çalıştırma butonu
 
 jobs:
   build:
@@ -21,12 +21,19 @@ jobs:
         run: pip install requests
 
       - name: Scripti Calistir
-        run: python your_script_name.py  # Script adını buraya yaz (örn: bot.py)
+        run: |
+          if [ -f bot.py ]; then
+            python bot.py
+          else
+            echo "Hata: bot.py dosyası ana dizinde bulunamadı!"
+            ls -R # Mevcut dosyaları listeler (hata ayıklama için)
+            exit 1
+          fi
 
       - name: Degisiklikleri Kaydet ve Pushla
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add lists/*.m3u
+          git add lists/*.m3u || echo "Yeni dosya yok"
           git commit -m "Liste Güncellendi: $(date)" || exit 0
           git push
