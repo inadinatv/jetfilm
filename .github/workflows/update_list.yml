@@ -1,0 +1,32 @@
+name: Film Listesini Guncelle
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Her gece 00:00'da otomatik çalışır
+  workflow_dispatch: # Manuel çalıştırma butonu ekler
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu Kopyala
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Gereksinimleri Yukle
+        run: pip install requests
+
+      - name: Scripti Calistir
+        run: python your_script_name.py  # Script adını buraya yaz (örn: bot.py)
+
+      - name: Degisiklikleri Kaydet ve Pushla
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add lists/*.m3u
+          git commit -m "Liste Güncellendi: $(date)" || exit 0
+          git push
